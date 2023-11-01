@@ -18,5 +18,10 @@ namespace ClockApp
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
         }
+
+        public static List<TimeZoneInfo> TimeZones = new List<TimeZoneInfo>();
+        public static List<Alarm> Alarms = new List<Alarm>();
+        public static List<Timer> Timers = new List<Timer>();
+        public static List<Stopwatch> Stopwatches = new List<Stopwatch>();
     }
 }
