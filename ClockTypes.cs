@@ -27,5 +27,6 @@ namespace ClockApp
     {
         public TimeSpan Elapsed = new TimeSpan();
         public bool IsActive = false;
+        public string Title;
     }
 }
