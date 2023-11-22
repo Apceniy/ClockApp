@@ -24,9 +24,9 @@ namespace ClockApp
         private void Form1_Load(object sender, EventArgs e)
         {
             var tz = TimeZoneInfo.GetSystemTimeZones();
-            comboBox1.DataSource = tz;
-            comboBox1.DisplayMember = "DisplayName";
-            comboBox1.ValueMember = "Id";
+            comboBoxAddTimezone.DataSource = tz;
+            comboBoxAddTimezone.DisplayMember = "DisplayName";
+            comboBoxAddTimezone.ValueMember = "Id";
             items.CollectionChanged += Items_CollectionChanged;
             timer1.Start();
         }
@@ -49,6 +49,7 @@ namespace ClockApp
             GroupBox gb = new GroupBox();
             gb.Height = 50;
             gb.Width = 770;
+            gb.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             Label name = new Label();
             name.Text = tzName;
             name.Location = new Point(5, 10);
@@ -65,14 +66,14 @@ namespace ClockApp
             btn.Location = new Point(740, 10);
             btn.Width = 20;
             btn.Height = 20;
-            btn.Click += Btn_Click;
+            btn.Tag = gb;
+            btn.Click += BtnRemoveTZ_Click;
 
             gb.Controls.Add(name);
             gb.Controls.Add(time);
             gb.Controls.Add(btn);
-            btn.Tag = gb;
-            gb.Tag = (string)comboBox1.SelectedValue;
-            flowLayoutPanel1.Controls.Add(gb);
+            gb.Tag = (string)comboBoxAddTimezone.SelectedValue;
+            flowLayoutPanelTimezones.Controls.Add(gb);
             item.control = time;
         }
         private void RemoveTime(WorldTimeItem item)
@@ -81,15 +82,15 @@ namespace ClockApp
             gb.Dispose();
         }
 
-        private void button1_Click(object sender, EventArgs ev)
+        private void buttonAddTimezone_Click(object sender, EventArgs ev)
         {
-            if (comboBox1.SelectedIndex != -1)
+            if (comboBoxAddTimezone.SelectedIndex != -1)
             {
-                items.Add(new WorldTimeItem() { Id = (string)comboBox1.SelectedValue });
+                items.Add(new WorldTimeItem() { Id = (string)comboBoxAddTimezone.SelectedValue });
             }
         }
 
-        private void Btn_Click(object sender, EventArgs e)
+        private void BtnRemoveTZ_Click(object sender, EventArgs e)
         {
             var gb = (GroupBox)((Button)sender).Tag;
             string id = (string)gb.Tag;
