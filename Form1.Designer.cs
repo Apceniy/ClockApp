@@ -105,7 +105,7 @@ namespace ClockApp
             this.buttonAddTimezone.TabIndex = 1;
             this.buttonAddTimezone.Text = "Добавить";
             this.buttonAddTimezone.UseVisualStyleBackColor = true;
-            this.buttonAddTimezone.Click += new System.EventHandler(this.buttonAddTimezone_Click);
+            this.buttonAddTimezone.Click += new System.EventHandler(this.ButtonAddTimezone_Click);
             // 
             // comboBoxAddTimezone
             // 

@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace ClockApp
 {
+    class WorldTime
+    {
+        public string Id { set; get; }
+        public System.Windows.Forms.Control Control { set; get; }
+    }
+
     class Alarm
     {
         public TimeSpan TimeOfDay = new TimeSpan();
