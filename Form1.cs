@@ -1,5 +1,4 @@
-﻿using ClockApp.models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -7,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,11 +14,9 @@ namespace ClockApp
 {
     public partial class Form1 : Form
     {
-        private ObservableCollection<models.WorldTimeItem> items;
         public Form1()
         {
             InitializeComponent();
-            items = new ObservableCollection<models.WorldTimeItem>();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -27,8 +25,12 @@ namespace ClockApp
             comboBoxAddTimezone.DataSource = tz;
             comboBoxAddTimezone.DisplayMember = "DisplayName";
             comboBoxAddTimezone.ValueMember = "Id";
-            items.CollectionChanged += Items_CollectionChanged;
-            timer1.Start();
+            Program.TimeZones.CollectionChanged += Items_CollectionChanged;
+            Task.Factory.StartNew(() =>
+            {
+                Thread.Sleep(1010 - DateTime.Now.Millisecond);
+                this.Invoke(new Action(timer1.Start));
+            });
         }
 
         private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -36,14 +38,14 @@ namespace ClockApp
             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    AddTime((WorldTimeItem)e.NewItems[0]);
+                    AddTime((WorldTime)e.NewItems[0]);
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    RemoveTime((WorldTimeItem)e.OldItems[0]);
+                    RemoveTime((WorldTime)e.OldItems[0]);
                     break;
             }
         }
-        private void AddTime(WorldTimeItem item)
+        private void AddTime(WorldTime item)
         {
             string tzName = TimeZoneInfo.GetSystemTimeZones().FirstOrDefault(i => i.Id == item.Id).DisplayName;
             GroupBox gb = new GroupBox();
@@ -74,19 +76,20 @@ namespace ClockApp
             gb.Controls.Add(btn);
             gb.Tag = (string)comboBoxAddTimezone.SelectedValue;
             flowLayoutPanelTimezones.Controls.Add(gb);
-            item.control = time;
+            item.Control = time;
+            UpdateText(item);
         }
-        private void RemoveTime(WorldTimeItem item)
+        private void RemoveTime(WorldTime item)
         {
-            var gb = (GroupBox)((Label)item.control).Tag;
+            var gb = (GroupBox)((Label)item.Control).Tag;
             gb.Dispose();
         }
 
-        private void buttonAddTimezone_Click(object sender, EventArgs ev)
+        private void ButtonAddTimezone_Click(object sender, EventArgs ev)
         {
             if (comboBoxAddTimezone.SelectedIndex != -1)
             {
-                items.Add(new WorldTimeItem() { Id = (string)comboBoxAddTimezone.SelectedValue });
+                Program.TimeZones.Add(new WorldTime() { Id = (string)comboBoxAddTimezone.SelectedValue });
             }
         }
 
@@ -94,8 +97,8 @@ namespace ClockApp
         {
             var gb = (GroupBox)((Button)sender).Tag;
             string id = (string)gb.Tag;
-            var item = items.FirstOrDefault(i => i.Id == id);
-            items.Remove(item);
+            var item = Program.TimeZones.FirstOrDefault(i => i.Id == id);
+            Program.TimeZones.Remove(item);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -105,11 +108,13 @@ namespace ClockApp
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            foreach (var item in items)
-            {
-                var tz = TimeZoneInfo.GetSystemTimeZones().FirstOrDefault(i => i.Id == item.Id);
-                item.control.Text = (DateTime.UtcNow + tz.BaseUtcOffset).ToString();
-            }
+            Program.TimeZones.ToList().ForEach(UpdateText);
+        }
+
+        private void UpdateText(WorldTime item)
+        {
+            var tz = TimeZoneInfo.GetSystemTimeZones().FirstOrDefault(i => i.Id == item.Id);
+            item.Control.Text = (DateTime.UtcNow + tz.BaseUtcOffset).ToString();
         }
     }
 }

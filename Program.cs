@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,7 +20,7 @@ namespace ClockApp
             Application.Run(new Form1());
         }
 
-        public static List<TimeZoneInfo> TimeZones = new List<TimeZoneInfo>();
+        public static ObservableCollection<WorldTime> TimeZones = new ObservableCollection<WorldTime>();
         public static List<Alarm> Alarms = new List<Alarm>();
         public static List<Timer> Timers = new List<Timer>();
         public static List<Stopwatch> Stopwatches = new List<Stopwatch>();
